@@ -94,3 +94,63 @@ function makeResponsive() {
       .attr("stroke-width", "1")
       .attr("stroke", "black");
  
+      //adding text element
+  var text = chartGroup.selectAll(".stateText")
+                    .data(ourData)
+                    .enter()
+                    .append("text")
+                    .classed ("stateText", true)
+                    .attr("x", data => xScale(data.poverty))
+                    .attr("y", data => yScale(data.healthcare))
+                    .attr("font-size", "8px")
+                    .text(data => data.abbr)
+  
+      
+  // Append axes titles
+      chartGroup.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .attr("class", "axisText")
+        .text("Lacks Healthcare (%)");
+  
+      chartGroup.append("text")
+        .attr("transform", `translate(${width / 2}, ${height + margin.top - 15})`)
+        .attr("class", "axisText")
+        .text("In Poverty (%)");
+  
+    //ToolTip
+    var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .html(function(data) {
+    return (`${data.state}<br>In Poverty (%) :${data.poverty}%<br> Lacks Healthcare (%) :${data.healthcare}%`);
+    });
+
+
+  chartGroup.call(toolTip);
+
+  // Display tooltip
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.style("display", "block");
+    toolTip.style("left", d3.event.pageX + "px");
+    toolTip.style("top", d3.event.pageY + "px");
+    toolTip.show(data, this);
+  })
+  // Hide tooltip
+    .on("mouseout", function(data) {
+      toolTip.hide(data);
+    });
+
+}).catch(function(error) {
+  console.log(error);
+}); 
+
+
+};
+  
+// When the browser loads, makeResponsive() is called.
+makeResponsive();
+
+// When the browser window is resized, makeResponsive() is called.
+d3.select(window).on("resize", makeResponsive);
